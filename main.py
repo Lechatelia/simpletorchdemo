@@ -43,14 +43,14 @@ def main(args):
     print(f"Using {device} device")
 
 
-    model = NeuralNetwork().to(device)
+    model = NeuralNetwork(args.dropout).to(device)
     print(model)
 
     loss_fn = nn.CrossEntropyLoss()
     if args.optimizer == 'sgd':
-        optimizer = torch.optim.SGD(model.parameters(), lr=args.base_lr)
+        optimizer = torch.optim.SGD(model.parameters(), lr=args.base_lr, weight_decay=args.wd)
     elif args.optimizer == 'adam':
-        optimizer = torch.optim.adamw(model.parameters(), lr=args.base_lr)
+        optimizer = torch.optim.AdamW(model.parameters(), lr=args.base_lr)
 
     for t in range(args.epochs):
         print(f"Epoch {t+1}\n-------------------------------")
@@ -102,12 +102,14 @@ def test(dataloader, model, loss_fn):
     
 def get_args_parser():
     parser = argparse.ArgumentParser('argument for torch demo ')
-    parser.add_argument('--optimizer', default='sgd', type=str)
+    parser.add_argument('--optimizer', default='adam', type=str)
     parser.add_argument('--lr_scheduler', default='step', type=str)
     parser.add_argument('--epochs', default=6, type=int)
-    parser.add_argument('--base_lr', default=1e-2, type=float)
+    parser.add_argument('--base_lr', default=1e-4, type=float)
+    parser.add_argument('--wd', default=0.001, type=float)
     parser.add_argument('--lrschduler', default=False, type=bool)
     parser.add_argument('--batch_size', default=64, type=int)
+    parser.add_argument('--dropout', default=0.1, type=int)
     
     args = parser.parse_args()
     
